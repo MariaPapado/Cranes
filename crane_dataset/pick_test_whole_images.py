@@ -1,3 +1,5 @@
+##kratame kapoies oloklhres eikones gia testing prin tis kopsoume se patches. kai ap autes me ena crane kai ap autes me multiple cranes
+
 import os
 import subprocess
 import random
