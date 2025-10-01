@@ -1,0 +1,27 @@
+meta pou katevazw tis eikones me ta get_cranes_from_....py files,
+ta anevazw CVAT kai ta kanoume label se YOLO obb format
+meta ta kanw download ap to cvat pali epilegontas YOLO obb format
+kai kanw ta ekshs parakatw:
+
+unzip and move everything to /IMAGES, /LABELS
+
+check_files.py
+
+mv_single_crane_files.py
+
+mv rest of files in IMAGES , LABELS to CRANE_dataset/train/images ../labels
+
+pick_test_whole_images.py  for both cases
+
+crop_single_crane_images.py
+
+split_multiple_cranes_images.py
+
+mv patches/images/ ../labels to CRANE_dataset-split/../train
+
+jpg_to_png.py
+
+mv_val_test.py
+
+
+ready
