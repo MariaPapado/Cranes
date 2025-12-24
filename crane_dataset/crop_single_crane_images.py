@@ -178,7 +178,7 @@ for id in ids:
 
 
 
-            for i in range(0,2):
+            for i in range(0,3):
 
 
                 rimg, bbox = random_rot(img, pts)
