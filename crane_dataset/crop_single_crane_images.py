@@ -1,6 +1,3 @@
-###crop patches of single crane images. sugkekrimena kovw random patches pou panta periexoun omws oloklhro to crane. edw exw 
-##dialeksei na kopsw 3 random patches
-
 import cv2
 import os
 import numpy as np
@@ -117,8 +114,37 @@ def extract_patch_with_bbox(image, bbox, patch_size):
     return patch, points
 
             
+def random_rot(img, pts):
+        r_num = random.randint(0, 3)  # Adjusted to allow for 270-degree rotation
+        print('rnum', r_num)
+        if r_num == 0:
+            img = np.rot90(img, k=0)  # No rotation, coordinates stay the same
+        elif r_num == 1:
+            img = np.rot90(img, k=1)  # 90 degrees counterclockwise
+            # Adjust the points for 90-degree counterclockwise rotation
+            pts = np.array([(int(y1 * img.shape[0]), img.shape[1] - int(x1 * img.shape[1])),
+                            (int(y2 * img.shape[0]), img.shape[1] - int(x2 * img.shape[1])),
+                            (int(y3 * img.shape[0]), img.shape[1] - int(x3 * img.shape[1])),
+                            (int(y4 * img.shape[0]), img.shape[1] - int(x4 * img.shape[1]))], dtype=np.int32)
+        elif r_num == 2:
+            img = np.rot90(img, k=2)  # 180 degrees counterclockwise
+            # Adjust the points for 180-degree counterclockwise rotation
+            pts = np.array([(img.shape[1] - int(x1 * img.shape[1]), img.shape[0] - int(y1 * img.shape[0])),
+                            (img.shape[1] - int(x2 * img.shape[1]), img.shape[0] - int(y2 * img.shape[0])),
+                            (img.shape[1] - int(x3 * img.shape[1]), img.shape[0] - int(y3 * img.shape[0])),
+                            (img.shape[1] - int(x4 * img.shape[1]), img.shape[0] - int(y4 * img.shape[0]))], dtype=np.int32)
+        elif r_num == 3:
+            img = np.rot90(img, k=3)  # 270 degrees counterclockwise (90 degrees clockwise)
+            # Adjust the points for 270-degree counterclockwise rotation
+            pts = np.array([(img.shape[0] - int(y1 * img.shape[0]), int(x1 * img.shape[1])),
+                            (img.shape[0] - int(y2 * img.shape[0]), int(x2 * img.shape[1])),
+                            (img.shape[0] - int(y3 * img.shape[0]), int(x3 * img.shape[1])),
+                            (img.shape[0] - int(y4 * img.shape[0]), int(x4 * img.shape[1]))], dtype=np.int32)
 
 
+        bbox = pts.flatten()
+
+        return img, bbox
 ############@@@@@@@@@@@@@@@@@@@@@@@@STILL at one point the bbox is outside the patch
 
 # Define paths
@@ -144,16 +170,21 @@ for id in ids:
                             (int(x2 * img.shape[1]), int(y2 * img.shape[0])),
                             (int(x3 * img.shape[1]), int(y3 * img.shape[0])),
                             (int(x4 * img.shape[1]), int(y4 * img.shape[0]))], dtype=np.int32)
-            cnt=cnt+1
 
 
             #img_x_center = img.shape[1]//2
             #img_y_center = img.shape[0]//2
             #img_center = (img_x_center, img_y_center)
-            bbox = pts.flatten()
 
-            for i in range(0,3):
-                patch, points = extract_patch_with_bbox(img, bbox, psize)
+
+
+            for i in range(0,2):
+
+
+                rimg, bbox = random_rot(img, pts)
+
+
+                patch, points = extract_patch_with_bbox(rimg, bbox, psize)
                 line = yolo_obb_polygon_line(points, psize[1], psize[0])
                 
                 cv2.imwrite('./patches/images/{}_{}.png'.format(id[:-4],i), patch)
@@ -163,4 +194,3 @@ for id in ids:
             #subprocess.run(['mv', './images/{}.png'.format(id[:-4]), './images_single_crane/'])
             #subprocess.run(['mv', './labels/{}.txt'.format(id[:-4]), './labels_single_crane/'])
 
-print(cnt)
