@@ -5,6 +5,7 @@ from ultralytics.data.split_dota import split_test, split_trainval
 import math
 import random
 import subprocess
+from tqdm import tqdm 
 
 def center_of_oriented_bbox(coords):
     # Assuming coords is a list of tuples or a list of 4 values [x1, y1, x2, y2, ..., x4, y4]
@@ -116,7 +117,7 @@ def extract_patch_with_bbox(image, bbox, patch_size):
             
 def random_rot(img, pts):
         r_num = random.randint(0, 3)  # Adjusted to allow for 270-degree rotation
-        print('rnum', r_num)
+#        print('rnum', r_num)
         if r_num == 0:
             img = np.rot90(img, k=0)  # No rotation, coordinates stay the same
         elif r_num == 1:
@@ -156,8 +157,8 @@ cnt=0
 # Example usage
 ids = os.listdir(label_dir)
 #print(ids)
-for id in ids:
-        print(id)
+for _,id in enumerate(tqdm(ids)):
+        #print(id)
     #if '38_41314_20240625.png' in id:
         img = cv2.imread('./images_single_crane/{}'.format(id[:-4]+'.png'))
         annotations = read_annotations('./labels_single_crane/{}'.format(id))
@@ -179,6 +180,7 @@ for id in ids:
 
 
             for i in range(0,3):
+#            for i in range(0,2):
 
 
                 rimg, bbox = random_rot(img, pts)
@@ -186,11 +188,20 @@ for id in ids:
 
                 patch, points = extract_patch_with_bbox(rimg, bbox, psize)
                 line = yolo_obb_polygon_line(points, psize[1], psize[0])
-                
-                cv2.imwrite('./patches/images/{}_{}.png'.format(id[:-4],i), patch)
 
-                with open("./patches/labels/{}_{}.txt".format(id[:-4],i),"w") as f: f.write(line+"\n")            
-                
+                try:
+                    if patch.shape == (640,640,3):
+
+                        cv2.imwrite('./patches/images/{}_{}.png'.format(id[:-4],i), patch)
+
+
+                        with open("./patches/labels/{}_{}.txt".format(id[:-4],i),"w") as f: f.write(line+"\n")            
+                    else:
+                        print('ooops')
+
+                except:
+                    print(id)
+                    print(patch.shape)
+
             #subprocess.run(['mv', './images/{}.png'.format(id[:-4]), './images_single_crane/'])
             #subprocess.run(['mv', './labels/{}.txt'.format(id[:-4]), './labels_single_crane/'])
-
